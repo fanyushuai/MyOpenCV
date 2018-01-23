@@ -1,40 +1,37 @@
-#-*- coding: utf-8 -*-
-'''
-Created on 2018-1-23
-
-@author: 土肥圆
-'''
-from skimage.transform import rotate
-from skimage.feature import local_binary_pattern
-from skimage import data, io
-from skimage.color import label2rgb
-import skimage
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
 import cv2
+import numpy as np
+ 
+ 
+def olbp(src):
+     dst = np.zeros(src.shape,dtype=src.dtype)
+     for i in range(1,src.shape[0]-1):
+         for j in range(1,src.shape[1]-1):
+             pass
+             center = src[i][j]
+             code = 0;  
+             code |= (src[i-1][j-1] >= center) << 7;  
+             code |= (src[i-1][j  ] >= center) << 6;  
+             code |= (src[i-1][j+1] >= center) << 5;  
+             code |= (src[i  ][j+1] >= center) << 4;  
+             code |= (src[i+1][j+1] >= center) << 3;  
+             code |= (src[i+1][j  ] >= center) << 2;  
+             code |= (src[i+1][j-1] >= center) << 1;  
+             code |= (src[i  ][j-1] >= center) << 0;  
+   
+             dst[i-1][j-1]= code;  
+     return dst
+ 
+ 
+lena = cv2.imread("img/zly.jpg")
+cv2.namedWindow("lena")
+cv2.imshow("lena", lena)
+cv2.waitKey(0)
+ 
+gray = cv2.cvtColor(lena,cv2.COLOR_RGB2GRAY)
+x = olbp(gray)
 
-# settings for LBP
-radius = 3
-n_points = 8 * radius
 
-
-# 读取图像
-image = cv2.imread('1.png')
-
-#显示到plt中，需要从BGR转化到RGB，若是cv2.imshow(win_name, image)，则不需要转化
-image1 = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-plt.subplot(131)
-plt.imshow(image1)
-
-# 转换为灰度图显示
-image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-plt.subplot(132)
-plt.imshow(image, cmap='gray')
-
-# 处理
-lbp = local_binary_pattern(image, n_points, radius)
-
-plt.subplot(133)
-plt.imshow(lbp, cmap='gray')
-plt.show()
+ 
+cv2.namedWindow("olbp")
+cv2.imshow("olbp", x)
+cv2.waitKey(0)
